@@ -1,0 +1,7 @@
+apiVersion: huozj.io/v1alpha1
+kind: Fufu
+metadata:
+  name: xiaofufu
+spec:
+  color: yello
+  weight: 5kg

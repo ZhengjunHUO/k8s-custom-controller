@@ -1,0 +1,39 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: fufus.huozj.io
+spec:
+  group: huozj.io
+  names:
+    kind: Fufu
+    listKind: FufuList
+    plural: fufus
+    singular: fufu
+    shortNames:
+    - ff
+  scope: Namespaced
+  versions:
+  - name: v1alpha1
+    served: true
+    storage: true
+    schema:
+      openAPIV3Schema:
+        description: huo made a custom resource named fufu
+        type: object
+        properties:
+          spec:
+            description: resource fufu's spec part
+            type: object
+            properties:
+              color:
+                type: string
+              weight:
+                type: string
+          status:
+            description: resource fufu's status part
+            type: object
+            properties:
+              lastPosition:
+                type: string
+    subresources:
+      status: {}
