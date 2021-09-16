@@ -13,11 +13,14 @@ require (
 	golang.org/x/sys v0.0.0-20210915083310-ed5796bab164 // indirect
 	golang.org/x/term v0.0.0-20210615171337-6886f2dfbf5b // indirect
 	golang.org/x/text v0.3.7 // indirect
+	gonum.org/v1/netlib v0.0.0-20190331212654-76723241ea4e // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/protobuf v1.27.1 // indirect
 	k8s.io/api v0.22.1
 	k8s.io/apimachinery v0.22.1
 	k8s.io/client-go v0.22.1
+	k8s.io/code-generator v0.22.1 // indirect
+	k8s.io/klog v0.3.1 // indirect
 	k8s.io/klog/v2 v2.20.0 // indirect
 	k8s.io/utils v0.0.0-20210820185131-d34e5cb4466e // indirect
 )
