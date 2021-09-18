@@ -20,6 +20,8 @@ import (
 	"k8s.io/client-go/util/workqueue"
 )
 
+const MAX_RETRY int = 3
+
 type Controller struct {
 	clientset	kubernetes.Interface
 	informer	cache.SharedIndexInformer
@@ -109,7 +111,7 @@ func (c *Controller) Run(chStop <-chan struct{}) {
 
         log.Println("Controller up!")
 
-        wait.Until(c.dummy, time.Second, chStop)
+        wait.Until(c.workerUp, time.Second, chStop)
 }
 
 
@@ -123,6 +125,32 @@ func (c *Controller) LastSyncResourceVersion() string {
         return c.informer.LastSyncResourceVersion()
 }
 
-func (c *Controller) dummy() {
-	select{}
+func (c *Controller) workerUp() {
+	for c.hasNext() {}
+}
+
+func (c *Controller) hasNext() bool {
+	item, shutdown := c.queue.Get()
+	if shutdown {
+		return false
+	}
+
+	defer c.queue.Done(item)
+	if err := c.Process(item.(Event)); err == nil {
+		c.queue.Forget(item)
+	}else if c.queue.NumRequeues(item) < MAX_RETRY {
+		log.Printf("[WARN] Failed to process %s: %v. Retrying ...\n", item.(Event).key, err)
+		c.queue.AddRateLimited(item)
+	}else{
+		log.Printf("[WARN] Failed to process %s: %v. No retry left, Abort !\n", item.(Event).key, err)
+		c.queue.Forget(item)
+		utilruntime.HandleError(err)
+	}
+
+	return true
+}
+
+func (c *Controller) Process(event Event) error {
+	log.Printf("Handled %v\n", event)
+	return nil
 }
