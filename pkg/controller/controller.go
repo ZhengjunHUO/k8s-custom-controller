@@ -151,6 +151,20 @@ func (c *Controller) hasNext() bool {
 }
 
 func (c *Controller) Process(event Event) error {
-	log.Printf("Handled %v\n", event)
+	item, _ , err := c.informer.GetIndexer().GetByKey(event.key)
+	if err != nil {
+		return fmt.Errorf("Unable to get object[key %s] from store: %v", event.key, err)
+	}
+
+	handler := &DefaultHandler{}
+	switch event.eventType {
+	case "create":
+		handler.Created(item)
+	case "update":
+		handler.Updated(item)
+	case "delete":
+		handler.Deleted(item)
+	}
+
 	return nil
 }
