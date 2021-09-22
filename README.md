@@ -10,3 +10,9 @@ Put theory into practice, build a custom controller myself in order to know bett
 > \<groups-versions\>:  huozj.io:v1alpha1
 >
 > the path should be: pkg/apis/huozj.io/v1alpha1/*.go
+
+## Quick out-cluster test
+
+```bash
+$ go run main.go --kubeconfig ~/.kube/config
+```
