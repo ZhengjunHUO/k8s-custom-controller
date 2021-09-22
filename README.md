@@ -16,3 +16,20 @@ Put theory into practice, build a custom controller myself in order to know bett
 ```bash
 $ go run main.go --kubeconfig ~/.kube/config
 ```
+
+## in-cluster deployment
+
+```bash
+# Create namespace
+$ kubectl create ns controller
+# Add credential if pull from private register
+$ kubectl create -n controller secret generic regcred --from-file=.dockerconfigjson=<PATH/TO/.docker/config> --type=kubernetes.io/dockerconfigjson
+# Create serviceaccount with list/watch/get privileges on pod
+$ kubectl apply -f kubernetes/rbac.yaml
+# Change the image's value to your registry in deployment.yaml
+$ kubectl apply -f kubernetes/deployment.yaml
+# Check the controller pod's output
+$ kubectl logs -f custom-controller-xxx
+```
+
+## TODO: helm chart

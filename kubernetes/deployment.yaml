@@ -1,0 +1,23 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: custom-controller
+  labels:
+    app: custom-controller
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: custom-controller
+  template:
+    metadata:
+      labels:
+        app: custom-controller
+    spec:
+      serviceAccountName: sa-custom-controller
+      containers:
+      - name: custom-controller
+        image: <IMAGE_REGISTRY/custom-controller:v1>
+      imagePullSecrets:
+      - name: regcred
