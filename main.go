@@ -15,15 +15,19 @@ func main() {
 	flag.StringVar(&kubeconfigPath, "kubeconfig", "", "Path to kubeconfig")
 	flag.Parse()
 
+	// Load config from kubeconfig file given in command line
+	// if absent will try to load from serviceaccount's token (incluster)
 	config, err := clientcmd.BuildConfigFromFlags("", kubeconfigPath)
 	if err != nil {
 		log.Fatalln(err)
 	}
 
+	// Get clientset for built-in resources
 	clientset, err := kubernetes.NewForConfig(config)
 	if err != nil {
 		log.Fatalln(err)
 	}
 
+	// Start controller
 	controller.Start(clientset)
 }

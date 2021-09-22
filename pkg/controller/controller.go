@@ -24,10 +24,14 @@ const MAX_RETRY int = 3
 
 type Controller struct {
 	clientset	kubernetes.Interface
+	// List and watch the delta of certain resource and trigger the event handler
+	// normally is to send the key to the queue
 	informer	cache.SharedIndexInformer
+	// dedicated to the controller to receive event(key)
 	queue		workqueue.RateLimitingInterface
 }
 
+// Sent to queue by informer if match the condition 
 type Event struct {
         key          string
         eventType    string
@@ -39,9 +43,11 @@ func Start(client kubernetes.Interface) {
 
 	chStop := make(chan struct{})
 	defer close(chStop)
+	defer fmt.Println("Receive interrupt signal, stop controller, cleanup ...")
 
 	go ctlr.Run(chStop)
 
+	// receive interrupt signal, close chStop channel to stop controller
 	chIntrpt := make(chan os.Signal, 1)
         signal.Notify(chIntrpt, os.Interrupt, syscall.SIGTERM)
 
@@ -49,6 +55,7 @@ func Start(client kubernetes.Interface) {
 }
 
 func newController(client kubernetes.Interface, resourceType string) *Controller {
+	// Set the list watch functions, clientset is needed here
 	lw := cache.ListWatch{
 		ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
 			return client.CoreV1().Pods(metav1.NamespaceAll).List(context.TODO(), options)
@@ -58,12 +65,14 @@ func newController(client kubernetes.Interface, resourceType string) *Controller
 		},
 	}
 
+	// use SharedIndexInformer
 	informer := cache.NewSharedIndexInformer(&lw, &corev1.Pod{}, 0, cache.Indexers{})
 
 	var event Event
 	var err error
 	queue := workqueue.NewRateLimitingQueue(workqueue.DefaultControllerRateLimiter())
 
+	// register event handler to the informer
 	informer.AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: func(obj interface{}) {
 			event.eventType, event.resourceType = "create", resourceType
@@ -98,6 +107,7 @@ func newController(client kubernetes.Interface, resourceType string) *Controller
 	}
 }
 
+// Implement cache.Controller interface
 func (c *Controller) Run(chStop <-chan struct{}) {
         defer utilruntime.HandleCrash()
         defer c.queue.ShutDown()
@@ -111,6 +121,7 @@ func (c *Controller) Run(chStop <-chan struct{}) {
 
         log.Println("Controller up!")
 
+	// loop until interrupted
         wait.Until(c.workerUp, time.Second, chStop)
 }
 
@@ -129,6 +140,7 @@ func (c *Controller) workerUp() {
 	for c.hasNext() {}
 }
 
+// Retrieve the event from the queue, and handle it
 func (c *Controller) hasNext() bool {
 	item, shutdown := c.queue.Get()
 	if shutdown {
@@ -137,11 +149,14 @@ func (c *Controller) hasNext() bool {
 
 	defer c.queue.Done(item)
 	if err := c.Process(item.(Event)); err == nil {
+		// item processed ok
 		c.queue.Forget(item)
 	}else if c.queue.NumRequeues(item) < MAX_RETRY {
+		// Process failed, still able to retry, add it back to queue
 		log.Printf("[WARN] Failed to process %s: %v. Retrying ...\n", item.(Event).key, err)
 		c.queue.AddRateLimited(item)
 	}else{
+		// Process failed, no quota to retry, throw it away
 		log.Printf("[WARN] Failed to process %s: %v. No retry left, Abort !\n", item.(Event).key, err)
 		c.queue.Forget(item)
 		utilruntime.HandleError(err)
@@ -151,12 +166,14 @@ func (c *Controller) hasNext() bool {
 }
 
 func (c *Controller) Process(event Event) error {
+	// send key in event to informer's indexer to retrieve item in shared cache 
 	item, _ , err := c.informer.GetIndexer().GetByKey(event.key)
 	if err != nil {
 		return fmt.Errorf("Unable to get object[key %s] from store: %v", event.key, err)
 	}
 
 	handler := &DefaultHandler{}
+	// Call handler depends on the event type
 	switch event.eventType {
 	case "create":
 		handler.Created(item)

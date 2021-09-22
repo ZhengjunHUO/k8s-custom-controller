@@ -11,6 +11,7 @@ type Handler interface {
 	Deleted(item interface{})
 }
 
+// default handler simply print out the pod's basic information
 type DefaultHandler struct {}
 
 func (dh *DefaultHandler) Created(item interface{}) {
