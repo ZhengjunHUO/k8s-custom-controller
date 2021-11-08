@@ -17,7 +17,7 @@ Put theory into practice, build a custom controller myself in order to know bett
 $ go run main.go --kubeconfig ~/.kube/config
 ```
 
-## in-cluster deployment
+## In-cluster deployment
 
 ```bash
 # Create namespace
