@@ -11,6 +11,17 @@ Put theory into practice, build a custom controller myself in order to know bett
 >
 > the path should be: pkg/apis/huozj.io/v1alpha1/*.go
 
+## Code structure
+```
+├── hack			# code generator
+├── kubernetes			# manifests used for testing
+└── pkg
+    ├── apis			# custome type definition, with runtime.Object implementation
+    │				# expose its AddToScheme
+    ├── client			# define clienset, informers, listers
+    └── controller		# custom controller business logic
+```
+
 ## Quick out-cluster test
 
 ```bash
