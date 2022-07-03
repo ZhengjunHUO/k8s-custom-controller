@@ -46,12 +46,14 @@ type Event struct {
 }
 
 func Start(client kubernetes.Interface, hzjclient hzjcs.Interface) {
+	// instantiate a new controller
 	ctlr := newController(client, hzjclient, "pod", "fufu")
 
 	chStop := make(chan struct{})
 	defer close(chStop)
 	defer fmt.Println("Receive interrupt signal, stop controller, cleanup ...")
 
+	// start the contoller
 	go ctlr.Run(chStop)
 
 	// receive interrupt signal, close chStop channel to stop controller
@@ -180,6 +182,8 @@ func (c *Controller) HasSynced() bool {
 
 // Implement cache.Controller interface
 func (c *Controller) LastSyncResourceVersion() string {
+	fmt.Println("[DEBUG] c.informer.LastSyncResourceVersion(): ", c.informer.LastSyncResourceVersion())
+	fmt.Println("[DEBUG] c.hzjinformer.LastSyncResourceVersion(): ", c.hzjinformer.LastSyncResourceVersion())
         return c.informer.LastSyncResourceVersion()
 }
 

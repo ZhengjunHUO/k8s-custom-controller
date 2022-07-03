@@ -37,6 +37,15 @@ $ kubectl get fufu
 ### Quick out-cluster test
 ```bash
 $ go run main.go --kubeconfig ~/.kube/config
+# In a new terminal, create/delete a pod and watch the output
+$ kubectl run alpine --image=alpine --restart=Never --command -- sleep infinity
+$ kubectl delete alpine
+# In a new terminal, create/update/delete a CR and watch the output
+$ kubectl apply -f kubernetes/crd.yaml
+$ kubectl apply -f kubernetes/fufu.yaml
+$ vim kubernetes/fufu.yaml
+$ kubectl apply -f kubernetes/fufu.yaml
+$ kubectl delete -f kubernetes/fufu.yaml
 ```
 
 ### In-cluster deployment
