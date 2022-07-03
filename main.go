@@ -7,11 +7,12 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/kubernetes"
 	"github.com/ZhengjunHUO/k8s-custom-controller/pkg/controller"
+	hzjcs "github.com/ZhengjunHUO/k8s-custom-controller/pkg/client/clientset/versioned"
 )
 
 func main() {
 	var kubeconfigPath string
-	
+
 	flag.StringVar(&kubeconfigPath, "kubeconfig", "", "Path to kubeconfig")
 	flag.Parse()
 
@@ -28,6 +29,11 @@ func main() {
 		log.Fatalln(err)
 	}
 
+	hzjclientset, err := hzjcs.NewForConfig(config)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
 	// Start controller
-	controller.Start(clientset)
+	controller.Start(clientset, hzjclientset)
 }

@@ -3,6 +3,7 @@ package controller
 import (
 	"log"
 	"k8s.io/api/core/v1"
+	hzjv1alpha1 "github.com/ZhengjunHUO/k8s-custom-controller/pkg/apis/huozj.io/v1alpha1"
 )
 
 type Handler interface {
@@ -25,6 +26,22 @@ func (dh *DefaultHandler) Updated(item interface{}) {
 }
 
 func (dh *DefaultHandler) Deleted(item interface{}) {
-	p := item.(*v1.Pod)
-	log.Printf("Pod %v/%v deleted!\n", p.Namespace, p.Name)
+	log.Printf("Pod deleted!\n")
+}
+
+// print out type fufu's information
+type HzjHandler struct {}
+
+func (hh *HzjHandler) Created(item interface{}) {
+	f := item.(*hzjv1alpha1.Fufu)
+	log.Printf("Fufu %v/%v created!\n", f.Namespace, f.Name)
+}
+
+func (hh *HzjHandler) Updated(item interface{}) {
+	f := item.(*hzjv1alpha1.Fufu)
+	log.Printf("Fufu %v/%v updated!\n", f.Namespace, f.Name)
+}
+
+func (hh *HzjHandler) Deleted(item interface{}) {
+	log.Printf("Fufu deleted!\n")
 }
