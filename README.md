@@ -11,6 +11,15 @@ Put theory into practice, build a custom controller myself in order to know bett
 >
 > the path should be: pkg/apis/huozj.io/v1alpha1/*.go
 
+### code-generator update
+```
+# Prepare code-generator docker image
+$ cd hack
+$ docker build -t kubernetes-codegen:latest --build-arg REPO_NAME=github.com/ZhengjunHUO/k8s-custom-controller .
+# Generate code in a seperate env (mounting the current project in container under ${GOPATH}/src/)
+$ bash runInContainer.sh
+```
+
 ### Code structure
 ```
 ├── hack			# code generator
