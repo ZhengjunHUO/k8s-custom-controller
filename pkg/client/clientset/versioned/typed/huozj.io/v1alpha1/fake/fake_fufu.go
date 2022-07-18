@@ -117,7 +117,7 @@ func (c *FakeFufus) UpdateStatus(ctx context.Context, fufu *v1alpha1.Fufu, opts 
 // Delete takes name of the fufu and deletes it. Returns an error if one occurs.
 func (c *FakeFufus) Delete(ctx context.Context, name string, opts v1.DeleteOptions) error {
 	_, err := c.Fake.
-		Invokes(testing.NewDeleteAction(fufusResource, c.ns, name), &v1alpha1.Fufu{})
+		Invokes(testing.NewDeleteActionWithOptions(fufusResource, c.ns, name, opts), &v1alpha1.Fufu{})
 
 	return err
 }
