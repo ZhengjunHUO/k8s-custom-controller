@@ -12,7 +12,7 @@ Put theory into practice, build a custom controller myself in order to know bett
 > the path should be: pkg/apis/huozj.io/v1alpha1/*.go
 
 ### code-generator update
-```
+```bash
 # Prepare code-generator docker image
 $ cd hack
 $ docker build -t kubernetes-codegen:latest --build-arg REPO_NAME=github.com/ZhengjunHUO/k8s-custom-controller .
@@ -61,11 +61,14 @@ $ kubectl delete -f kubernetes/fufu.yaml
 ```bash
 # Create namespace
 $ kubectl create ns controller
-# Add credential if pull from private register
-$ kubectl create -n controller secret generic regcred --from-file=.dockerconfigjson=<PATH/TO/.docker/config> --type=kubernetes.io/dockerconfigjson
 # Create serviceaccount with list/watch/get privileges on pod
 $ kubectl apply -f kubernetes/rbac.yaml
-# Change the image's value to your registry in deployment.yaml
+# Build custom controller image and push it to your registry
+$ docker build -t <IMAGE_REGISTRY/custom-controller:v1> .
+$ docker push <IMAGE_REGISTRY/custom-controller:v1>
+# Add credential if pull from private register
+$ kubectl create -n controller secret generic regcred --from-file=.dockerconfigjson=<PATH/TO/.docker/config> --type=kubernetes.io/dockerconfigjson
+# Change the image's value to your registry in deployment.yaml before apply
 $ kubectl apply -f kubernetes/deployment.yaml
 # Check the controller pod's output
 $ kubectl logs -f custom-controller-xxx
