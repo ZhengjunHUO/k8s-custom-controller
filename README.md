@@ -30,7 +30,9 @@ $ bash runInContainer.sh
     ├── client			# define clienset, informers, listers
     └── controller		# custom controller business logic
 ```
-    
+### Implemented by following the diagram from kubernetes/sample-controller
+![diagram from kubernetes/sample-controller](https://raw.githubusercontent.com/kubernetes/sample-controller/master/docs/images/client-go-controller-interaction.jpeg)
+
 ## Custome Ressource
 ```bash
 # Create crd & cr
