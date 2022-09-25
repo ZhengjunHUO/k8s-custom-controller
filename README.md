@@ -1,5 +1,8 @@
 # k8s-custom-controller
-Put theory into practice, build a custom controller myself in order to know better about Kubernetes' mechanism.
+build a custom controller in order to know better about Kubernetes' mechanism.
+
+### Update
+see [v1alpha2](https://github.com/ZhengjunHUO/kubebuilder) a fully functional CR implemented with concise code thanks to the controller-runtime package.
 
 ### About kubernetes/code-generator:
 - Unfortunately it doesn't support go mod well, the output will write under $GOPATH/src/<MODULE_NAME>, if the --output-base option is set it generate the <OUTPUT_PATH>/<MODULE_NAME> , in a word it just can't merge the generated code in the current module under the current path we're working on (if i'm not mistaken).
